@@ -1,5 +1,5 @@
-CODEDIRS=. ./radix
-INCDIRS=. ./radix
+CODEDIRS=. ./radix ./quicksort
+INCDIRS=. ./radix ./quicksort
 
 SOURCE := $(foreach D, $(CODEDIRS), $(wildcard $(D)/*.cpp))
 EXCLUDE := ./main.cpp
