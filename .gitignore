@@ -31,4 +31,14 @@
 *.out
 *.app
 
-/.vscode
+# Virtual Environment folder
+/.venv
+
+# PDFs
+*.pdf
+
+# .bin files
+*.bin
+
+# Personal VSCode configuration folder
+.vscode/
