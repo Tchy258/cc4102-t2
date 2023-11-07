@@ -10,7 +10,7 @@ DEPFILES = $(patsubst %.cpp,%.d,$(SOURCE))
 OUT	= main.exe
 CC	 = g++
 DEPFLAGS= $(foreach D, $(INCDIRS), -I$(D)) -MP -MD
-FLAGS	 = -O0 -g -Wall -std=c++17
+FLAGS	 = -O3 -Wall -std=c++17
 OBJFLAGS = -c -o
 
 all: $(OUT)
