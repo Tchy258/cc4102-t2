@@ -2,7 +2,6 @@
 #define QUICK_SORT_HPP
 typedef unsigned long long ull;
 
-ull partition(ull arr[], ull start, ull end);
-void quickSort(ull arr[], ull start, ull end, ull arraySize);
+void quickSort(ull arr[], ull m, ull n);
 
 #endif // QUICK_SORT_HPP
