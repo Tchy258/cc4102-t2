@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <limits>
-#define N 100000000ULL
+#define N 10000000ULL
 
 ull* generateRandomArray(ull seed, ull universeSize) {
     ull arraySize = N;
@@ -35,49 +35,51 @@ int main(int argc, char** argv) {
     file.open("results.csv");
     std::stringstream header;
     header << "U \t QuickSort \t RadixSort k=1";
-    for (ull k = 2; k <= 64; k++) {
+    for (ull k = 2; k <= integerLog2(N); k++) {
         header << "\t RadixSort k=" << k;
     }
     header << "\n";
     file << header.str();
     file.flush();
-    for (ull universeSize = 2; universeSize <= std::numeric_limits<ull>::max() && universeSize != 0; universeSize = universeSize << 1) {
+    ull* arrayCopy = new ull[N];
+    for (ull universeSize = 2; universeSize <= std::numeric_limits<ull>::max(); universeSize = universeSize << 1 == 0 ? std::numeric_limits<ull>::max() : universeSize << 1) {
+        ull kLimit = std::min(integerLog2(universeSize), integerLog2(N));
         std::chrono::duration<ull, std::nano> qSortTotal = std::chrono::duration<ull, std::nano>::zero();
-        std::vector<std::chrono::duration<ull, std::nano>> rSortTotal(integerLog2(universeSize) + 1,std::chrono::duration<ull, std::nano>::zero());
+        std::vector<std::chrono::duration<ull, std::nano>> rSortTotal(kLimit + 1,std::chrono::duration<ull, std::nano>::zero());
         std::stringstream line;
         line << universeSize << "\t";
         for (int i = 0; i < 100; i++) {
-            ull* array = generateRandomArray(0, universeSize);
+            ull* array = generateRandomArray(seed, universeSize);
             std::chrono::duration<ull, std::nano> elapsed;
-            ull* arrayCopy = new ull[N];
             std::memcpy(arrayCopy, array, N * sizeof(ull));
-            auto start = std::chrono::high_resolution_clock::now();
-            quickSort(arrayCopy, 0, N - 1, N);
-            auto end = std::chrono::high_resolution_clock::now();
+            auto start = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now());
+            quickSort(arrayCopy, 0, N - 1);
+            auto end = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now());
             elapsed = end - start;
             qSortTotal += elapsed;
-            delete[] arrayCopy;
-            for (ull k = 1; k <= integerLog2(universeSize); k++ ) {
+            for (ull k = 1; k <= kLimit; k++ ) {
                 std::chrono::duration<ull, std::nano> elapsed;
-                ull* arrayCopy = new ull[N];
                 std::memcpy(arrayCopy, array, N * sizeof(ull));
-                auto start = std::chrono::high_resolution_clock::now();
+                auto start = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now());
                 radixSort(arrayCopy, N, universeSize, k);
-                auto end = std::chrono::high_resolution_clock::now();
+                auto end = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now());
                 elapsed = end - start;
                 rSortTotal[k] += elapsed;
-                delete[] arrayCopy;
             }
             delete[] array;
             line << (qSortTotal.count() / 100) << "\t";
-            for (ull k = 1; k <= integerLog2(universeSize); k++ ) {
+            for (ull k = 1; k <= kLimit; k++ ) {
                 line << (rSortTotal[k].count() / 100) << "\t";
             }
         }
         line << "\n";
         file << line.str();
         file.flush();
+        if (universeSize == std::numeric_limits<ull>::max()) {
+            break;
+        }
     }
+    delete[] arrayCopy;
     file.close();
     return 0;
 }
