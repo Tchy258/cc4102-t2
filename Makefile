@@ -16,7 +16,7 @@ OBJFLAGS = -c -o
 all: $(OUT)
 
 main.exe: main.cpp $(OBJS)
-	$(CC) $^ -g -o $@
+	$(CC) $^ $(FLAGS) -o $@
 
 %.o: %.cpp
 	$(CC) $(FLAGS) $(DEPFLAGS) $(OBJFLAGS) $@ $<
