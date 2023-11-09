@@ -34,9 +34,9 @@ int main(int argc, char** argv) {
     std::ofstream file;
     file.open("results.csv");
     std::stringstream header;
-    header << "U \t QuickSort \t RadixSort k=1";
+    header << "U,QuickSort,RadixSort k=1";
     for (ull k = 2; k <= integerLog2(N); k++) {
-        header << "\t RadixSort k=" << k;
+        header << ",RadixSort k=" << k;
     }
     header << "\n";
     file << header.str();
@@ -44,33 +44,33 @@ int main(int argc, char** argv) {
     ull* arrayCopy = new ull[N];
     for (ull universeSize = 2; universeSize <= std::numeric_limits<ull>::max(); universeSize = universeSize << 1 == 0 ? std::numeric_limits<ull>::max() : universeSize << 1) {
         ull kLimit = std::min(integerLog2(universeSize), integerLog2(N));
-        std::chrono::duration<ull, std::nano> qSortTotal = std::chrono::duration<ull, std::nano>::zero();
-        std::vector<std::chrono::duration<ull, std::nano>> rSortTotal(kLimit + 1,std::chrono::duration<ull, std::nano>::zero());
+        std::chrono::duration<ull, std::micro> qSortTotal = std::chrono::duration<ull, std::micro>::zero();
+        std::vector<std::chrono::duration<ull, std::micro>> rSortTotal(kLimit + 1,std::chrono::duration<ull, std::micro>::zero());
         std::stringstream line;
-        line << universeSize << "\t";
+        line << universeSize << ",";
         for (int i = 0; i < 100; i++) {
             ull* array = generateRandomArray(seed, universeSize);
-            std::chrono::duration<ull, std::nano> elapsed;
+            std::chrono::duration<ull, std::micro> elapsed;
             std::memcpy(arrayCopy, array, N * sizeof(ull));
-            auto start = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now());
+            auto start = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now());
             quickSort(arrayCopy, 0, N - 1);
-            auto end = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now());
+            auto end = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now());
             elapsed = end - start;
             qSortTotal += elapsed;
             for (ull k = 1; k <= kLimit; k++ ) {
-                std::chrono::duration<ull, std::nano> elapsed;
+                std::chrono::duration<ull, std::micro> elapsed;
                 std::memcpy(arrayCopy, array, N * sizeof(ull));
-                auto start = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now());
+                auto start = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now());
                 radixSort(arrayCopy, N, universeSize, k);
-                auto end = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now());
+                auto end = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now());
                 elapsed = end - start;
                 rSortTotal[k] += elapsed;
             }
             delete[] array;
-            line << (qSortTotal.count() / 100) << "\t";
-            for (ull k = 1; k <= kLimit; k++ ) {
-                line << (rSortTotal[k].count() / 100) << "\t";
-            }
+        }
+        line << (qSortTotal.count() / 100) << ",";
+        for (ull k = 1; k <= kLimit; k++ ) {
+            line << (rSortTotal[k].count() / 100) << ",";
         }
         line << "\n";
         file << line.str();
