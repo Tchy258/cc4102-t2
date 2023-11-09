@@ -42,3 +42,6 @@
 
 # Personal VSCode configuration folder
 .vscode/
+
+# CSVs
+*.csv
